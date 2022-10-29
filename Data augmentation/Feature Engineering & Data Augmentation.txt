@@ -1,0 +1,9 @@
+Feature Engineering & Data Augmentation
+The following section will extract the relevant features and engineer each data point so that we can fit it into the model. Because the type of inputs are important, the features will be transformed based on the model architecture. This will also include data augmentation methods. The higher level architecture will be a deep learning recurrent neural network with LSTM and time distributed layers.
+The current statistical baseline model using multivariate regression uses multiple predictors as input. According to Knaff 2013, the following predictors were calculated for their intensity model that were not included in the HURDAT2 database. These features can be calculated from the data loaded into our current object model.
+1.	Date Information
+2.	Zonal Speed Of The Storm (U) (kt)
+3.	Meridional Speed Of The Storm (V) (kt)
+4.	12-h Change In Intensity (DVMX) (kt)
+
+The shape on the input to the LSTM will be in a 3D array with the format [samples, timestamps, features]. We will intitially begin with 1 time step and evaluate more can benefit our model. The output requires a 5 day forecast and observations without track data 5 days in the future will not be used.
