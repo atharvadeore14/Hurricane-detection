@@ -1,7 +1,10 @@
 Hurricane-detection
  
+We have reuploaded the project now, sorry for the delay 
+
 This project is open for all contributer as it is a big project and shall add value to your profiles, we are making it for a problem statement given by NHC
  
+Also please star the repo if you like the project
  
 A machine learning algorithm to forecast the intensity and trajectory of Atlantic tropical storms
 
