@@ -1,0 +1,33 @@
+
+# Create hurricane class
+class hurricane(object) :
+def      init    (self,  name,  id)  : # Set instance variables self.name  =  name
+self.id = id
+self.entries = dict() self.models = dict()
+
+return
+
+
+# Add hurricane track entry based on standard HURDAT2 format
+
+
+
+
+
+# Add hurricane model errors
+def  add_model(self,  name,  model)  : self.models[name]  =  model
+
+return
+# Storm ID Key for matching between datasets
+storm_ids = dict()
+
+# Parse in hurricanes
+hurricanes = dict()
+print("Transforming HURDAT2 into objects . . .")
+for index, entry in dataset.hurricanes.iterrows() :
+print("Transforming  {}/{}  entries  from  HURDAT2".format(index  +  1,  len(dataset.hu
+# New hurricane
+if entry['storm_id'] not in hurricanes :
+hurricanes[entry['storm_id']]  =  hurricane(entry['storm_name'],  entry['storm_ storm_ids[entry['storm_id']] = entry['storm_name']
+# Add entry to hurricane
+hurricanes[entry['storm_id']].add_entry(entry[2:]) print("\nDone!")
