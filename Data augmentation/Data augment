@@ -54,10 +54,13 @@ if None in [storm.entries.get(entries[index]['entry_time'] +
 datetime.timedelta(hours = future)) for fut
 
 
-
 # Calculate time steps and their features for independent values
-
-
+sample = []
+for step in range(timesteps) :
+# Training sample
+timestep = entries[index - step]
+previous  =  entries[index  -  step  -  1]
+sample.append([timestep['entry_time']]  +  [[feature_extraction(timestep, x.append(sample)  #  Add  our  constructed  sample
 
 
 
