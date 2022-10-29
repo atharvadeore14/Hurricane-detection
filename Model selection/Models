@@ -37,7 +37,8 @@ return  pd.DataFrame(errors)
 
 
 # Predict values
-
+wind_predictions = model_wind.predict(X_test) lat_predictions = model_lat.predict(X_test)
+long_predictions = model_long.predict(X_test)
 
 
 

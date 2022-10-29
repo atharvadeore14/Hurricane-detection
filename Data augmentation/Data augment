@@ -66,10 +66,19 @@ sample.append([timestep['entry_time']]  +  [[feature_extraction(timestep, x.appe
 
 
 # Calculate time steps and their features for dependent values
+for future in times :
+timestep  =  storm.entries.get(entries[index]['entry_time']  +  datetime.tim previous  =  storm.entries.get(entries[index]['entry_time']  +  datetime.tim
 
+if timestep and previous:
+y[future].append(feature_extraction(timestep,  previous))
+else :
+ 
+y[future].append(None)
 
-
-
+# Return output, if there is no output, return None.
+if len(x) is 0 :
+return None else:
+return {'x': x, 'y': y}
 
 
 
