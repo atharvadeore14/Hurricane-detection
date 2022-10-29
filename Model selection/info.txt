@@ -1,0 +1,12 @@
+Model Selection
+
+The following models are to be compared:
+
+Bidirectional LSTM with Time Distributed(Best performance)
+
+LSTM with Time Distributed
+
+MLP
+
+Bidirectional GRU with Time Distributed
+
