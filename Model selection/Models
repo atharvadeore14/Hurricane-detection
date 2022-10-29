@@ -1,0 +1,79 @@
+#load Models and History
+from tensorflow import keras
+model_wind = keras.models.load_model('docs/models/model_wind')
+model_wind_history  =  pd.read_json('docs/models/history_model_wind.json')
+
+model_lat = keras.models.load_model('docs/models/model_lat')
+model_lat_history  =  pd.read_json('docs/models/history_model_lat.json')
+
+
+model_long = keras.models.load_model('docs/models/model_long')
+model_long_history  =  pd.read_json('docs/models/history_model_long.json')
+
+#Updated Code
+def ai_errors(predictions, observations, history = None) : '''
+PURPOSE: Provide descriptive statistics on the predicted output versus the obser METHOD: Take the errors of the predictions and answers and then calculate stand INPUT: predictions - 2D array of predictions of observed output
+observations - 2D array measurements of observed output
+history - Keras history model for displaying model loss, default is Non
+OUTPUT:
+'''
+errors = []
+for i in range(len(predictions)) :
+for  j  in  range(len(predictions[i]))  :
+# Calculate errors
+error  =  predictions[i][j]  -  observations[i][j] errors.append(error)
+
+# Display history and erros
+plt.figure(1)
+plt.hist(errors, bins = 50) plt.title('error histogram') plt.xlabel('error')
+plt.ylabel('frequency') plt.grid(True)
+plt.figure(2)
+plt.plot(history['loss'])
+plt.plot(history['val_loss']) plt.title('model loss')
+plt.ylabel('loss') plt.xlabel('epoch')
+plt.legend(['train', 'test'], loc='upper left') plt.show()
+
+return  pd.DataFrame(errors)
+
+
+# Predict values
+
+
+
+
+# Scale  back  our  predictions  # Wind
+wind_predictions_scaled  =  [scaler.inverse_transform([[0,0,winds[0],0,0,0,0,0,0,0,0]
+for prediction in wind_predictions]
+y_wind_test_scaled  =  [scaler.inverse_transform([[0,0,winds[0],0,0,0,0,0,0,0,0]  for  w
+for observation in y_test_wind]
+# Latitude
+lat_predictions_scaled  =  [scaler.inverse_transform([[lat[0],0,0,0,0,0,0,0,0,0,0]  for
+for prediction in lat_predictions]
+y_lat_test_scaled  =  [scaler.inverse_transform([[lat[0],0,0,0,0,0,0,0,0,0,0]  for  lat
+for observation in y_test_lat]
+# Longitude
+long_predictions_scaled  =  [scaler.inverse_transform([[0,long[0],0,0,0,0,0,0,0,0,0]  f
+for prediction in long_predictions]
+y_long_test_scaled  =  [scaler.inverse_transform([[0,long[0],0,0,0,0,0,0,0,0,0]  for  lo
+for observation in y_test_long]
+
+
+# Record wind predictions and observations
+print("Wind")
+wind_predictions  =  [[pred[2]  for  pred  in  hurricanes_pred]  for  hurricanes_pred  in  win wind_observations  =  [[obsrv[2]  for  obsrv  in  hurricanes_obsrv]  for  hurricanes_obsrv  i
+
+# Present Errors
+ai_errors(wind_predictions, wind_observations, model_wind_history).describe()
+
+
+print("Lat")
+lat_predictions  =  [[pred[0]  for  pred  in  hurricanes_pred]  for  hurricanes_pred  in  lat_ lat_observations  =  [[obsrv[0]  for  obsrv  in  hurricanes_obsrv]  for  hurricanes_obsrv  in ai_errors(lat_predictions, lat_observations, model_lat_history).describe()
+
+
+print("Long")
+long_predictions  =  [[pred[1]  for  pred  in  hurricanes_pred]  for  hurricanes_pred  in  lon long_observations  =  [[obsrv[1]  for  obsrv  in  hurricanes_obsrv]  for  hurricanes_obsrv  i ai_errors(long_predictions, long_observations, model_long_history).describe()
+
+
+
+
+
