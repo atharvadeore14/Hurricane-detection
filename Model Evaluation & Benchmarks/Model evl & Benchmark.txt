@@ -1,0 +1,4 @@
+The machine learning neural network will use 2 main methods of applied evaluation. The first will be evaluated compared to the other models that predict Atlantic hurricanes. The forecast errors have been loaded into each hurricane object corresponding to their forecast model; both the OFCL (official track) and the BCD5 (model using multivariate regression). The BCD5 model is "the CLP5 (track) and DSF5 (intensity) models merged" that uses the best track as input. BCD5 is similar to OCD5 except for the inputs to the models. The O is for operational input while the B is for best track input. The best track is only available post-season and is better than the operational input.
+
+References
+http://www.hurricanecity.com/models/models.cgi?page=models
