@@ -1,0 +1,233 @@
+test_data = hurdat2('docs/data/hurdat2-1851-2017-050118.txt')
+
+# Parse in hurricanes
+hurricanes_2017 = dict()
+print("Transforming 2017 HURDAT2 into objects . . .")
+for index, entry in test_data.hurricanes.iterrows() :
+print("Transforming  {}/{}  entries  from  HURDAT2".format(index  +  1,  len(dataset.hu
+# Filter to capture 2017 data
+if  entry['storm_id'][-4:]  !=  '2017'  :
+continue
+
+if entry['storm_id'] not in hurricanes_2017 :
+hurricanes_2017[entry['storm_id']]  =  hurricane(entry['storm_name'],  entry['s storm_ids[entry['storm_id']] = entry['storm_name']
+
+# Add entry to hurricane
+hurricanes_2017[entry['storm_id']].add_entry(entry[2:]) print("\nDone!")
+
+#  Filter  storms  that  have  more  than  6  entries.  We  need  at  least  6  to  calculate  5 spe
+storms_filter = [storm for storm in hurricanes_2017.values() if len(storm.entries) >
+
+# Begin creating hurricane forecast and track predictions
+tracks = {
+'storms' : [], # Reference storm
+'inputs' : [], # The inputs for the ai
+'valid_times' : [], # The valid time to compare to the error database
+}
+for index, storm in enumerate(storms_filter) :
+# Create inputs to ai. ai requires scaled data as input
+entries  =  [entry[1]  for  entry  in  sorted(storm.entries.items())]  #  Extracts  data
+
+
+# Scale the entries
+
+
+
+
+
+
+
+
+# If there's an incomplete value we can't process, skip it
+if any(None in entry for entry in extracted_features) :
+continue
+
+# Scale extracted features
+scaled_entries = scaler.transform(extracted_features)
+
+# Add to our results
+tracks['storms'].append(storm)
+tracks['inputs'].append(scaled_entries.tolist()) tracks['valid_times'].append(valid_time)
+
+print("\rDone  with  track  processing  {}/{}  storms".format(index  +  1,  len(storms_f tracks['inputs']  =  np.array(tracks['inputs'])
+
+ 
+tracks['wind_predictions_raw'] = model_wind.predict(tracks['inputs']) tracks['lat_predictions_raw'] = model_lat.predict(tracks['inputs'])
+tracks['long_predictions_raw'] = model_long.predict(tracks['inputs'])
+
+# Define a function to return the distance between two coordinates in nautical miles
+import math
+
+def distance(origin, destination): lat1, lon1 = origin
+lat2, lon2 = destination radius = 6371 # km
+
+dlat  =  math.radians(lat2-lat1) dlon  =  math.radians(lon2-lon1)
+a  =  math.sin(dlat/2)  *  math.sin(dlat/2)  +  math.cos(math.radians(lat1))  \
+*  math.cos(math.radians(lat2))  *  math.sin(dlon/2)  *  math.sin(dlon/2) c  =  2  *  math.atan2(math.sqrt(a),  math.sqrt(1-a))
+d = radius * c
+
+return d * 0.539957 # km to nautical miles
+# Scale back and store our wind predictions and our lat, long predictions
+tracks['wind_predictions'] = [] tracks['lat_predictions'] = [] tracks['long_predictions'] = [] intensity_errors = {
+'24' : [],
+'48' : [],
+'72' : [],
+'96' : [],
+'120' : []
+ 
+}
+track_errors = { '24' : [],
+'48' : [],
+'72' : [],
+'96' : [],
+'120' : []
+}
+for index, prediction in enumerate(tracks['wind_predictions_raw']) :
+# Use our standard scaler to scale the raw predictions back
+winds_scaled  =  [scaler.inverse_transform([[0,0,winds[0],0,0,0,0,0,0,0,0]  for  win lat_scaled  =  [scaler.inverse_transform([[lats[0],0,0,0,0,0,0,0,0,0,0]  for  lats  i long_scaled  =  [scaler.inverse_transform([[0,longs[0],0,0,0,0,0,0,0,0,0]  for  long
+
+# Extract the wind prediction from data structure and store into new data struct
+for i in range(len(winds_scaled)) :
+# The new data structure is a tuple of (wind, storm_id, valid_time, forecast
+wind_predictions = [] lat_predictions = [] long_predictions = []
+for  step,  pred  in  enumerate(winds_scaled[i])  : wind  =  pred[2]
+lat  =  lat_scaled[i][step][0] long  =  long_scaled[i][step][1]
+
+storm_id = tracks['storms'][index].id
+valid_time = tracks['valid_times'][index]
+forecast_time = valid_time + datetime.timedelta(days = step + 1)
+
+# See if we can find the error
+if forecast_time in hurricanes_2017[storm_id].entries :
+wind_truth  =  hurricanes_2017[storm_id].entries[forecast_time]['max_w lat_truth = hurricanes_2017[storm_id].entries[forecast_time]['lat'] long_truth  =  hurricanes_2017[storm_id].entries[forecast_time]['long' intensity_error = abs(wind_truth - wind)
+track_error = distance((lat_truth,long_truth), (lat, long))
+
+wind_predictions.append({ 'ai-wind' : wind,
+'truth' : wind_truth, 'storm_id' : storm_id,
+'valid_time' : valid_time,
+'forecast_time' : forecast_time
+ 
+[output[2]  for  output  in
+scaler.inverse_transform(
+[[0,0,winds[0],0,0,0,0,0,0,0,0]  for  winds  in  model_wind.predict(tracks['inputs'
+)]
+
+
+def hurricane_ai(input): '''
+input = {
+-120 : timestep,
+-96 : timestep,
+-72 : timestep,
+-48 : timestep,
+-24 : timestep,
+0 : timestep
+}
+output = {
+24  : prediction,
+48  : prediction,
+72  : prediction,
+96  : prediction,
+120  : prediction
+}
+timestep = {
+'lat' : float,
+'long' : float,
+'max-wind' : float,
+'min_pressure' : float, 'entry-time' : datetime
+}
+prediction = {
+'lat' : float,
+'long' : float,
+'max-winds' : float
+}
+
+# Take entries and transform them into our data model
+
+
+
+# Finally, use our hurricane ai to predict storm state
+lat  =  [output[0]  for  output  in  scaler.inverse_transform(
+[[lat[0],0,0,0,0,0,0,0,0,0,0]  for  lat  in  model_lat.predict(state)[0]])] long  =  [output[1]  for  output  in  scaler.inverse_transform(
+[[0,long[0],0,0,0,0,0,0,0,0,0]  for  long  in  model_long.predict(state)[0]])] wind  =  [output[2]  for  output  in  scaler.inverse_transform(
+[[0,0,wind[0],0,0,0,0,0,0,0,0]  for  wind  in  model_wind.predict(state)[0]])]
+
+output = dict()
+for  index,  value  in  enumerate([24,  48,  72,  96,  120])  : output[value] = {
+'lat' : lat[index],
+'long' : long[index],
+'max_wind' : wind[index]
+}
+
+return output
+
+from dateutil.parser import parse input = {
+0 : {
+'entry_time' : parse('Fri Aug 30 2019 1100 PM'),
+'lat' : 25.5,
+'long' : 71.4,
+'max_wind' : 140 / 1.51 , # mph to knots
+'min_pressure' : 948.0
+},
+-24 : {
+'entry_time' : parse('Thu Aug 29 2019 1100 PM'),
+'lat' : 23.3,
+'long' : 68.4,
+'max_wind' : 105 / 1.51 , # mph to knots
+'min_pressure' : 977.0
+},
+-48 : {
+'entry_time' : parse('Wed Aug 28 2019 1100 PM'),
+'lat' : 19.7,
+'long' : 66.0,
+'max_wind' : 85 / 1.51 , # mph to knots
+'min_pressure' : 986.0
+},
+-72 : {
+'entry_time' : parse('Tue Aug 27 2019 1100 PM'),
+'lat' : 16.0,
+'long' : 63.0,
+'max_wind' : 50 / 1.51 , # mph to knots
+'min_pressure' : 1006.0
+},
+-96 : {
+'entry_time' : parse('Mon Aug 26 2019 1100 PM'),
+'lat' : 13.2,
+'long' : 59.7,
+'max_wind' : 50 / 1.51 , # mph to knots
+'min_pressure' : 1003.0
+},
+-120 : {
+'entry_time' : parse('Sun Aug 25 2019 1100 PM'),
+'lat' : 11.7,
+'long' : 55.3,
+'max_wind' : 50 / 1.51 , # mph to knots
+'min_pressure' : 1003.0
+}
+}
+
+
+hurricane_ai(input)
+
+
+
+#END
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
