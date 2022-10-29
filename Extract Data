@@ -1,0 +1,20 @@
+
+# Import various libraries throughout the software
+from pprint import pprint
+import numpy as np
+import datetime
+import dateutil
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import RobustScaler
+
+#  Import  from  hurdat2  class  in  data  folder  and  models  class  from  hurricane-models  fo
+from  docs.data.hurdat2  import hurdat2
+from  docs.errors.models  import  models
+
+# Initialize Dataframe for hurricanes and error database
+dataset  =  hurdat2("docs/data/hurdat2.txt")  #  Note  that  this  data  includes  up  to and
+errors = models("docs/errors/1970-present_OFCL_v_BCD5_ind_ATL_TI_errors_noTDs.txt")
+
+# Show the first 5 records from Hurricane Katrina 2005 (AL122005)
+dataset.hurricanes.query('storm_id  ==  "AL122005"').head()
