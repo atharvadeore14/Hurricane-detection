@@ -37,8 +37,9 @@ x = []
 
 
 # Create testing data structure with a dictionary
-
-
+times  =  [time  *  lag  for  time  in  range(1,  (120  //  lag)  +  1)] 
+#  Begin  at  lag  hours
+y = dict([(time,[]) for time in times])
 
 
 
