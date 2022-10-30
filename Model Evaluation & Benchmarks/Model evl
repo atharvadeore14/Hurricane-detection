@@ -29,7 +29,15 @@ for index, storm in enumerate(storms_filter) :
 entries  =  [entry[1]  for  entry  in  sorted(storm.entries.items())]  #  Extracts  data
 
 
+
 # Scale the entries
+for  start_index  in  range(1,  len(entries)  -  5)  :  #  Go  through  each  entry # Build feature extraction
+extracted_features = []
+valid_time = None # Going to be set to the last element in the series
+for pivot in range(start_index, start_index + 5) :
+extracted_features.append(np.array(list(feature_extraction(entries[pivot
+if pivot is start_index + 4 : # We're on the last element
+valid_time = entries[pivot]['entry_time']
 
 
 
