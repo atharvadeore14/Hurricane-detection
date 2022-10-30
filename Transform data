@@ -9,7 +9,18 @@ return
 
 
 # Add hurricane track entry based on standard HURDAT2 format
+def add_entry(self, array) : entry = {
+array[0]  :  {  #  dateteime  of  entry
+'entry_time'  :  array[0], 'entry_id'  :  array[1],
+'entry_status'  :  array[2],
+'lat'  :  float(array[3][:-1]),  #  Convert  to  number  from  format  '#.#N' 'long'  :  float(array[4][:-1]),  #  Convert  to  number  from  format  '#.#W 'max_wind'  :  float(array[5]),
+'min_pressure'  :  None  if  array[6]  is  None  else  float(array[6]),  #  Ea
+'wind_radii'  :    array[7:],  #  Array  based  on  HURDAT2  format
+}
+}
+self.entries.update(entry)
 
+return
 
 
 
